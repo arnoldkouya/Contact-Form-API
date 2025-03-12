@@ -5,7 +5,6 @@ return [
     'to_email' => 'hello@kouya-group.fr',
     'subject_prefix' => '[Contact Form] ',
     'default_from' => 'noreply@kouya-group.fr',
-
     'smtp' => [
         'host' => 'smtp.kouya-group.fr',
         'port' => 587,

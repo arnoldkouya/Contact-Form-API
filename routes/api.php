@@ -8,7 +8,7 @@ $router = new Router();
 $router->post('/api/contact', function () {
     header("Access-Control-Allow-Origin: *");
     header("Access-Control-Allow-Headers: Content-Type");
-    header("Content-Type: application/json");
+    header("Content-Type: application/json; charset=UTF-8");
 
     $config = require __DIR__ . '/../config/config.php';
     $data = json_decode(file_get_contents("php://input"), true);
@@ -23,16 +23,16 @@ $router->post('/api/contact', function () {
     $result = $mailer->send();
 
     if ($result === true) {
-        echo json_encode(["status" => "success", "message" => "Message envoyé avec succès"]);
+        echo json_encode(["status": "success", "message": "Message envoyé avec succès"]);
     } else {
         http_response_code(500);
-        echo json_encode(["status" => "error", "message" => "Erreur : " . $result]);
+        echo json_encode(["status": "error", "message": "Erreur : " . $result]);
     }
 });
 
 $router->get('/api/ping', function () {
-    header("Content-Type: application/json");
-    echo json_encode(["status" => "ok", "message" => "Contact Form API is alive 🚀"]);
+    header("Content-Type: application/json; charset=UTF-8");
+    echo json_encode(["status" => "ok", "message" => "Contact Form API est actif 🚀"]);
 });
 
 return $router;

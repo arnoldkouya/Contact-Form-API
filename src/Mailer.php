@@ -20,8 +20,8 @@ class Mailer
     {
         $message = "📝 Nouveau message reçu depuis le formulaire :\n\n";
         foreach ($this->data as $key => $value) {
-            $label = ucfirst(str_replace('_', ' ', htmlspecialchars($key)));
-            $message .= "$label : " . htmlspecialchars($value) . "\n";
+            $label = ucfirst(str_replace('_', ' ', htmlspecialchars($key, ENT_QUOTES, 'UTF-8')));
+            $message .= "$label : " . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . "\n";
         }
         return $message;
     }
@@ -29,12 +29,17 @@ class Mailer
     public function send(): bool|string
     {
         $subject = $this->config['subject_prefix'] . ($this->data['subject'] ?? 'Message reçu');
-        $from = $this->data['email'] ?? $this->config['default_from'];
-        $fromName = $this->data['nom'] ?? 'Contact';
+        $from = $this->config['default_from'];
+        $fromName = 'Contact Form';
+
+        $replyToEmail = $this->data['email'] ?? null;
+        $replyToName = $this->data['nom'] ?? 'Visiteur';
 
         if ($this->config['use_smtp']) {
             $mail = new PHPMailer(true);
             try {
+                $mail->CharSet = 'UTF-8';
+                $mail->Encoding = 'base64';
                 $mail->isSMTP();
                 $mail->Host = $this->config['smtp']['host'];
                 $mail->SMTPAuth = true;
@@ -44,8 +49,13 @@ class Mailer
                 $mail->Port = $this->config['smtp']['port'];
 
                 $mail->setFrom($from, $fromName);
+
+                if ($replyToEmail) {
+                    $mail->addReplyTo($replyToEmail, $replyToName);
+                }
+
                 $mail->addAddress($this->config['to_email']);
-                $mail->Subject = $subject;
+                $mail->Subject = mb_encode_mimeheader($subject, 'UTF-8');
                 $mail->Body = $this->buildMessage();
 
                 $mail->send();
@@ -55,9 +65,11 @@ class Mailer
             }
         } else {
             $headers = "From: $from\r\n";
-            $headers .= "Reply-To: $from\r\n";
+            if ($replyToEmail) {
+                $headers .= "Reply-To: $replyToEmail\r\n";
+            }
             $headers .= "Content-Type: text/plain; charset=UTF-8";
-            return mail($this->config['to_email'], $subject, $this->buildMessage(), $headers);
+            return mail($this->config['to_email'], mb_encode_mimeheader($subject, 'UTF-8'), $this->buildMessage(), $headers);
         }
     }
 }
