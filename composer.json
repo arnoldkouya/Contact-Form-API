@@ -1,0 +1,12 @@
+{
+  "name": "kouya-group/contact-form-api",
+  "description": "Mini framework PHP pour gérer les formulaires de contact avec support SMTP.",
+  "autoload": {
+    "psr-4": {
+      "ContactFormAPI\\": "src/"
+    }
+  },
+  "require": {
+    "phpmailer/phpmailer": "^6.9"
+  }
+}
